@@ -4,7 +4,7 @@ import "testing"
 
 type testCase struct {
 	URL      string
-	Expected DB
+	Expected Driver
 }
 
 var testCases = []testCase{
@@ -24,7 +24,7 @@ var testCases = []testCase{
 
 func TestUtils(t *testing.T) {
 	for _, tc := range testCases {
-		got := detectSQLDB(tc.URL)
+		got := getDriver(tc.URL)
 		if got != tc.Expected {
 			t.Fatalf("Wanted %q got %q", tc.Expected, got)
 		}

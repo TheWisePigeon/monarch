@@ -1,5 +1,5 @@
 build:
-	@go build -o ./bin/monarch .
+	@go build -o monarch .
 
 test:
 	@go test ./... -v

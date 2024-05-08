@@ -16,18 +16,31 @@ Usage:
 `
 
 func main() {
+	upCMD := flag.NewFlagSet("up", flag.ExitOnError)
+	downCMD := flag.NewFlagSet("down", flag.ExitOnError)
 	source := flag.String("source", "migrations/", "The migrations folder")
 	db := flag.String("db", "", "The connection URL to the database")
+	safe := flag.Bool("safe", true, "The connection URL to the database")
+
+	upTo := upCMD.Int("to", -1, "Specifies the maximum migration version to run up to")
+	downTo := downCMD.Int("to", -1, "Specifies the maximum migration version to run down to")
 
 	flag.Parse()
 
 	if len(os.Args) < 2 {
 		fmt.Println(helpMessage)
+		os.Exit(0)
 	}
 
-	cmd := os.Args[1]
+	cmd := flag.Args()[0]
 	switch cmd {
 	case "up":
-		runUp(*source, *db, false)
+		code := runUp(*source, *db, *upTo, *safe)
+		os.Exit(code)
+	case "down":
+		code := runUp(*source, *db, *downTo, *safe)
+		os.Exit(code)
+	case "visualize":
+		return
 	}
 }
