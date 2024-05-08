@@ -3,3 +3,6 @@ build:
 
 test:
 	@go test ./... -v
+
+clean-cache:
+	@go clean -testcache

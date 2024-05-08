@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -11,7 +12,7 @@ type Driver string
 const (
 	Postgres Driver = "postgres"
 	MySQL    Driver = "mysql"
-	SQLite   Driver = "sqlite"
+	SQLite   Driver = "sqlite3"
 )
 
 func getDriver(dbURL string) Driver {
@@ -39,7 +40,11 @@ type Migration struct {
 	sql []byte
 }
 
-func MigrationFromFile(fileName string) (*Migration, bool) {
+func (m *Migration) Query() string {
+	return string(m.sql) + "\n"
+}
+
+func MigrationFromFile(fileName, source, kind string) (*Migration, bool) {
 	m := Migration{}
 	parts := strings.SplitN(fileName, "_", 2)
 	if len(parts) != 2 {
@@ -61,14 +66,20 @@ func MigrationFromFile(fileName string) (*Migration, bool) {
 	if parts[1] != "sql" {
 		return nil, false
 	}
-	if parts[0] != "up" && parts[0] != "down" {
+	if parts[0] != kind {
 		return nil, false
 	}
 	m.kind = parts[0]
-	file, err := os.Open(fileName)
+	file, err := os.Open(fmt.Sprintf("%s/%s", source, fileName))
 	if err != nil {
 		return nil, false
 	}
+	defer file.Close()
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, false
+	}
+	m.sql = make([]byte, stat.Size())
 	_, err = file.Read(m.sql)
 	if err != nil {
 		return nil, false
