@@ -58,10 +58,12 @@ func TestIsMigrationFile(t *testing.T) {
 
 func TestUpMigration(t *testing.T) {
 	source := "migrations"
-  db := "sqlite://testdata/test.db"
-	upTo := -1
-	safe := false
-	code := runUp(source, db, upTo, safe)
+	db := "sqlite://testdata/test.db"
+  migrationKind := "up"
+	targetVersion := -1
+	safe := true
+  verbose := true
+	code := run(migrationKind, source, db, targetVersion, safe, verbose)
 	if code != 0 {
 		t.Fatalf("Expected 0 but got %v", code)
 	}

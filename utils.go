@@ -41,7 +41,7 @@ type Migration struct {
 }
 
 func (m *Migration) Query() string {
-	return string(m.sql) + "\n"
+	return string(m.sql)
 }
 
 func MigrationFromFile(fileName, source, kind string) (*Migration, bool) {
@@ -85,4 +85,12 @@ func MigrationFromFile(fileName, source, kind string) (*Migration, bool) {
 		return nil, false
 	}
 	return &m, true
+}
+
+func GetDBVersion() {
+
+}
+
+func SetDBVersion() {
+
 }
