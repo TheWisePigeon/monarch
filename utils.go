@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"strconv"
@@ -87,10 +88,30 @@ func MigrationFromFile(fileName, source, kind string) (*Migration, bool) {
 	return &m, true
 }
 
-func GetDBVersion() {
+func GetDBVersion(db *sql.DB, driver Driver) (int, error) {
+	getTableQuery := ""
+	switch driver {
+	case Postgres:
+		getTableQuery = "select count(*) from information_schema.tables where table_schema='public' and table_name='schema_version'"
+	case SQLite:
+		getTableQuery = "select count(*) as count from sqlite_master where type='table' and name='schema_version'"
+	case MySQL:
+		getTableQuery = "select count(*) as count from information_schema.tables where table_name='schema_version'"
+	}
+	count := 0
+	err := db.QueryRow(getTableQuery).Scan(&count)
+	if count == 0 {
+		SetDBVersion(db, 0)
+		return 0, nil
+	}
+	version := 0
+	err = db.QueryRow("select version from schema_version").Scan(&version)
+	if err != nil {
 
+	}
+	return version, err
 }
 
-func SetDBVersion() {
-
+func SetDBVersion(db *sql.DB, version int) error {
+	return nil
 }
